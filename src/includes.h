@@ -4,7 +4,7 @@
 #include "Free_Fonts.h"
 #include "VG.h"
 
-#define REPEAT_CAL_TFT true
+#define REPEAT_CAL_TFT false
 #define CALIBRATION_FILE_TFT "/TouchCalData1"
 
 #define botao 34
