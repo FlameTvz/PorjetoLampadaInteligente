@@ -1,11 +1,13 @@
-#include "includes.h"
-#include <EEPROM.h>
-#include <TFT_eSPI.h>
+// Inclusão de bibliotecas necessárias para funcionamento do sistema
+#include "includes.h" // Biblioteca de inclusões customizadas, não padrão.
+#include <EEPROM.h> // Biblioteca para manipulação da memória EEPROM.
+#include <TFT_eSPI.h> // Biblioteca para controle do display TFT.
 
 // ========================= DECLARAÇÃO DE VARIÁVEIS E OBJETOS =========================
 
 TFT_eSPI tft = TFT_eSPI();
 
+// Definição de um tipo de estrutura chamada Botao para representar um botão na tela.
 typedef struct
 {
   uint16_t posX, posY, largura, altura;
@@ -15,7 +17,9 @@ typedef struct
   uint16_t corPressionado;
 } Botao;
 
+// Array de estruturas Botao para definir vários botões na tela.
 Botao botoes[] = {
+  // Definição dos botões com suas respectivas propriedades (posição, tamanho, texto, cores)
     {40, 20, 160, 70, "Ligar", TFT_BLUE, TFT_WHITE, TFT_DARKGREY},
     {40, 90, 160, 70, "Desligar", TFT_RED, TFT_WHITE, TFT_DARKGREY},
     {40, 160, 160, 70, "Configurar", TFT_YELLOW, TFT_WHITE, TFT_DARKGREY},
@@ -49,31 +53,21 @@ Botao botoes[] = {
         TFT_WHITE,
         TFT_DARKGREY,
     }};
-// Botao botoesConfig[] = {
-//       {60, 20, 60, 60, "+", TFT_GREEN, TFT_WHITE, TFT_DARKGREY,},  // Botão de Mais
-//     {140, 20, 60, 60, "-", TFT_GREEN, TFT_WHITE, TFT_DARKGREY,}, // Botão de Menos
-//     {60, 100, 140, 60, "Definir", TFT_BLUE, TFT_WHITE, TFT_DARKGREY,}
-// };
+
 //====================================================================================================================//
+// Declaração de funções que serão utilizadas no programa.
 void desenhaBotao(Botao b);
-// void handleButtonActions();
-void Temporizador_100mS_Cont();
-void Start_Temporizador(unsigned int Tempo);
-void Stop_Temporizador();
-void Pausa_Temporizador();
-void noPause_Temporizador();
-bool Status_Temporizador();
 void checkButtonPress();
 void TelaConfigurar();
 void touch_calibrate();
-void IRAM_ATTR onTimer();
 void setup();
 void loop();
 void atualizaDisplayValor();
 //====================================================================================================================//
-// === Implementações ===
+// Implementação da função desenhaBotao que recebe um botão e o desenha na tela.
 void desenhaBotao(Botao b)
 {
+  // Código para desenhar o botão no display.
   tft.fillRect(b.posX, b.posY, b.largura, b.altura, b.corFundo);
   tft.setTextColor(b.corTexto);
   uint16_t textoX = b.posX + (b.largura - (strlen(b.texto) * 6)) / 2; // Ajuste aproximado para centralizar o texto
@@ -82,54 +76,18 @@ void desenhaBotao(Botao b)
   tft.print(b.texto);
 }
 //====================================================================================================================//
-
-//====================================================================================================================//
-void Temporizador_100mS_Cont(void)
-{
-  if (Tempo_100mS)
-    if (!Pausa_Timer)
-      Tempo_100mS--;
-}
-//====================================================================================================================//
-void Start_Temporizador(unsigned int Tempo)
-{
-  Tempo_100mS = Tempo;
-  Pausa_Timer = false;
-}
-//====================================================================================================================//
-void Stop_Temporizador(void)
-{
-  Tempo_100mS = 0;
-  Pausa_Timer = false;
-}
-//====================================================================================================================//
-void Pausa_Temporizador(void)
-{
-  Pausa_Timer = true;
-}
-//====================================================================================================================//
-void noPause_Temporizador(void)
-{
-  Pausa_Timer = false;
-}
-//====================================================================================================================//
-bool Status_Temporizador(void)
-{
-  if (Tempo_100mS)
-    return true;
-  else
-    return false;
-}
-//====================================================================================================================//
+// Função telaInicio para configurar a tela inicial com os botões principais.
 void telaInicio(){
-    tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(TFT_BLACK);
   desenhaBotao(botoes[0]);
   desenhaBotao(botoes[1]);
   desenhaBotao(botoes[2]);
 }
 //====================================================================================================================//
+// Implementação da função checkButtonPress que verifica se algum botão foi pressionado.
 void checkButtonPress()
 {
+  // Código para verificar se um botão foi pressionado e realizar ações.
   uint16_t x, y;
   if (tft.getTouch(&x, &y))
   {
@@ -188,8 +146,10 @@ void checkButtonPress()
   }
 }
 //====================================================================================================================//
+// Função atualizaDisplayValor para atualizar o valor mostrado na tela.
 void atualizaDisplayValor()
 {
+  // Código para atualizar o valor exibido no display.
   tft.fillRect(posX, posY - 20, 100, 40, TFT_BLACK);
   // Configura a posição e cor para o texto do valor.
   tft.setCursor(posX, posY);
@@ -200,14 +160,17 @@ void atualizaDisplayValor()
   delay(100);
 }
 //====================================================================================================================//
+// Função TelaConfigurar para mostrar a tela de configuração com botões específicos.
 void TelaConfigurar()
 {
+  // Código para configurar a tela de configuração.
   pag = 2;
   desenhaBotao(botoes[3]);
   desenhaBotao(botoes[4]);
   desenhaBotao(botoes[5]);
 }
 //====================================================================================================================//
+// Função touch_calibrate para calibrar a tela de toque do display.
 void touch_calibrate()
 {
   uint16_t calData[5];
@@ -282,16 +245,9 @@ void touch_calibrate()
   }
 }
 //====================================================================================================================//
-void IRAM_ATTR onTimer()
-{
-  // digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-  //=== Leitura dos Botões ===
-  //
-  portENTER_CRITICAL_ISR(&timerMux);
-  interruptCounter++;
-  portEXIT_CRITICAL_ISR(&timerMux);
-}
+
 //====================================================================================================================//
+// A função setup é chamada uma vez quando o programa começa
 void setup()
 {
   Serial.begin(115200); // UART 0
@@ -308,33 +264,10 @@ void setup()
   tft.fillScreen(TFT_BLACK);
   telaInicio();
   //====================================================================================================================//
-
-  timer = timerBegin(0, 80, true);
-  timerAttachInterrupt(timer, &onTimer, true);
-  timerAlarmWrite(timer, 100000, true);
-  timerAlarmEnable(timer);
 }
 
 void loop()
 {
-
   checkButtonPress();
-  // handleButtonActions();
 
-  if (interruptCounter > 0)
-  {
-    portENTER_CRITICAL(&timerMux);
-    interruptCounter--;
-    portEXIT_CRITICAL(&timerMux);
-    //****************
-    // Funções 10mS
-    //
-    if (++Div_P100mS < 10)
-      ;
-    else
-    {
-      Div_P100mS = 0;
-      Temporizador_100mS_Cont();
-    }
-  }
 }
