@@ -10,5 +10,6 @@
 #define botao 34
 #define Saida_Rele  32
 #define LED_BUILTIN 2
+#define T_IRQ 27
 
 

@@ -1,6 +1,6 @@
 // Inclusão de bibliotecas necessárias para funcionamento do sistema
 #include "includes.h" // Biblioteca de inclusões customizadas, não padrão.
-#include <EEPROM.h> // Biblioteca para manipulação da memória EEPROM.
+#include <EEPROM.h>   // Biblioteca para manipulação da memória EEPROM.
 #include <TFT_eSPI.h> // Biblioteca para controle do display TFT.
 
 // ========================= DECLARAÇÃO DE VARIÁVEIS E OBJETOS =========================
@@ -19,7 +19,7 @@ typedef struct
 
 // Array de estruturas Botao para definir vários botões na tela.
 Botao botoes[] = {
-  // Definição dos botões com suas respectivas propriedades (posição, tamanho, texto, cores)
+    // Definição dos botões com suas respectivas propriedades (posição, tamanho, texto, cores)
     {40, 20, 160, 70, "Ligar", TFT_BLUE, TFT_WHITE, TFT_DARKGREY},
     {40, 90, 160, 70, "Desligar", TFT_RED, TFT_WHITE, TFT_DARKGREY},
     {40, 160, 160, 70, "Configurar", TFT_YELLOW, TFT_WHITE, TFT_DARKGREY},
@@ -52,6 +52,16 @@ Botao botoes[] = {
         TFT_BLUE,
         TFT_WHITE,
         TFT_DARKGREY,
+    },
+    {
+        40,
+        160,
+        160,
+        70,
+        "Voltar",
+        TFT_BLUE,
+        TFT_WHITE,
+        TFT_DARKGREY,
     }};
 
 //====================================================================================================================//
@@ -77,7 +87,9 @@ void desenhaBotao(Botao b)
 }
 //====================================================================================================================//
 // Função telaInicio para configurar a tela inicial com os botões principais.
-void telaInicio(){
+void telaInicio()
+{
+  pag = 1;
   tft.fillScreen(TFT_BLACK);
   desenhaBotao(botoes[0]);
   desenhaBotao(botoes[1]);
@@ -91,8 +103,11 @@ void checkButtonPress()
   uint16_t x, y;
   if (tft.getTouch(&x, &y))
   {
+
     if (pag == 1)
     {
+
+      delay(150);
       // Verificando o toque para o botão "Ligar"
       if (x >= botoes[0].posX && x <= (botoes[0].posX + botoes[0].largura) &&
           y >= botoes[0].posY && y <= (botoes[0].posY + botoes[0].altura))
@@ -114,35 +129,47 @@ void checkButtonPress()
         TelaConfigurar();
       }
     }
-    if (pag == 2)
-    {
-      if (x >= botoes[3].posX && x <= (botoes[3].posX + botoes[3].largura) &&
-          y >= botoes[3].posY && y <= (botoes[3].posY + botoes[3].altura))
+      // Verificando o toque para o botão "Mais"
+      else if (pag == 2)
       {
-        valor++;
-        atualizaDisplayValor();
+
+        if (x >= botoes[3].posX && x <= (botoes[3].posX + botoes[3].largura) &&
+            y >= botoes[3].posY && y <= (botoes[3].posY + botoes[3].altura))
+        {
+          TempoCronometro += 1000;
+          atualizaDisplayValor();
+        }
+        // Verificando o toque para o botão "Menos"
+        else if (x >= botoes[4].posX && x <= (botoes[4].posX + botoes[4].largura) &&
+                 y >= botoes[4].posY && y <= (botoes[4].posY + botoes[4].altura))
+        {
+          TempoCronometro -= 1000;
+
+          atualizaDisplayValor();
+        }
+
+        // Verificando o toque para o botão "Definir"
+        else if (x >= botoes[5].posX && x <= (botoes[5].posX + botoes[5].largura) &&
+                 y >= botoes[5].posY && y <= (botoes[5].posY + botoes[5].altura))
+        {
+          // Ação do botão Definir
+          varb = 1;
+          crono = millis();
+          digitalWrite(Saida_Rele, HIGH);
+        }
+        // Verificando o toque para o botão "Voltar"
+
+        else if (x >= botoes[6].posX && x <= (botoes[6].posX + botoes[6].largura) &&
+                 y >= botoes[6].posY && y <= (botoes[6].posY + botoes[6].altura))
+        {
+          if (digitalRead(T_IRQ) == 0)
+          {
+            telaInicio();
+            varb = 0;
+          }
+        }
       }
-
-      // Verificando o toque para o botão "Menos"
-      else if (x >= botoes[4].posX && x <= (botoes[4].posX + botoes[4].largura) &&
-               y >= botoes[4].posY && y <= (botoes[4].posY + botoes[4].altura))
-      {
-        valor--;
-        atualizaDisplayValor();
-      }
-
-      // Verificando o toque para o botão "Definir"
-      else if (x >= botoes[5].posX && x <= (botoes[5].posX + botoes[5].largura) &&
-               y >= botoes[5].posY && y <= (botoes[5].posY + botoes[5].altura))
-      {
-        // Ação do botão Definir
-
-        tft.fillScreen(TFT_BLACK);
-
-       telaInicio();
-        pag = 1;
-      }
-    }
+    
   }
 }
 //====================================================================================================================//
@@ -156,7 +183,8 @@ void atualizaDisplayValor()
   tft.setTextColor(corTexto);
 
   // Mostra o valor atualizado na tela.
-  tft.print(valor);
+  tft.print(TempoCronometro);
+
   delay(100);
 }
 //====================================================================================================================//
@@ -168,6 +196,7 @@ void TelaConfigurar()
   desenhaBotao(botoes[3]);
   desenhaBotao(botoes[4]);
   desenhaBotao(botoes[5]);
+  desenhaBotao(botoes[6]);
 }
 //====================================================================================================================//
 // Função touch_calibrate para calibrar a tela de toque do display.
@@ -246,6 +275,15 @@ void touch_calibrate()
 }
 //====================================================================================================================//
 
+void cronometro()
+{
+  if (millis() > crono + TempoCronometro && varb == 1)
+  {
+
+    digitalWrite(Saida_Rele, LOW);
+    Serial.println(crono);
+  }
+}
 //====================================================================================================================//
 // A função setup é chamada uma vez quando o programa começa
 void setup()
@@ -253,6 +291,7 @@ void setup()
   Serial.begin(115200); // UART 0
   tft.fillScreen(TFT_BLACK);
   pinMode(Saida_Rele, OUTPUT);
+  pinMode(T_IRQ, INPUT);
 
   // Display:
   tft.init();
@@ -268,6 +307,8 @@ void setup()
 
 void loop()
 {
+  cronometro();
   checkButtonPress();
-
+  Serial.println(digitalRead(T_IRQ));
+  Serial.println(pag);
 }
