@@ -129,47 +129,47 @@ void checkButtonPress()
         TelaConfigurar();
       }
     }
-      // Verificando o toque para o botão "Mais"
-      else if (pag == 2)
+    // Verificando o toque para o botão "Mais"
+    else if (pag == 2)
+    {
+
+      if (x >= botoes[3].posX && x <= (botoes[3].posX + botoes[3].largura) &&
+          y >= botoes[3].posY && y <= (botoes[3].posY + botoes[3].altura))
       {
-
-        if (x >= botoes[3].posX && x <= (botoes[3].posX + botoes[3].largura) &&
-            y >= botoes[3].posY && y <= (botoes[3].posY + botoes[3].altura))
-        {
-          TempoCronometro += 1000;
-          atualizaDisplayValor();
-        }
-        // Verificando o toque para o botão "Menos"
-        else if (x >= botoes[4].posX && x <= (botoes[4].posX + botoes[4].largura) &&
-                 y >= botoes[4].posY && y <= (botoes[4].posY + botoes[4].altura))
-        {
-          TempoCronometro -= 1000;
-
-          atualizaDisplayValor();
-        }
-
-        // Verificando o toque para o botão "Definir"
-        else if (x >= botoes[5].posX && x <= (botoes[5].posX + botoes[5].largura) &&
-                 y >= botoes[5].posY && y <= (botoes[5].posY + botoes[5].altura))
-        {
-          // Ação do botão Definir
-          varb = 1;
-          crono = millis();
-          digitalWrite(Saida_Rele, HIGH);
-        }
-        // Verificando o toque para o botão "Voltar"
-
-        else if (x >= botoes[6].posX && x <= (botoes[6].posX + botoes[6].largura) &&
-                 y >= botoes[6].posY && y <= (botoes[6].posY + botoes[6].altura))
-        {
-          if (digitalRead(T_IRQ) == 0)
-          {
-            telaInicio();
-            varb = 0;
-          }
-        }
+        TempoCronometro += 1000;
+        atualizaDisplayValor();
       }
-    
+      // Verificando o toque para o botão "Menos"
+      else if (x >= botoes[4].posX && x <= (botoes[4].posX + botoes[4].largura) &&
+               y >= botoes[4].posY && y <= (botoes[4].posY + botoes[4].altura))
+      {
+        if(TempoCronometro>0){
+        TempoCronometro -= 1000;
+        }
+        atualizaDisplayValor();
+      }
+
+      // Verificando o toque para o botão "Definir"
+      else if (x >= botoes[5].posX && x <= (botoes[5].posX + botoes[5].largura) &&
+               y >= botoes[5].posY && y <= (botoes[5].posY + botoes[5].altura))
+      {
+        // Ação do botão Definir
+        varb = 1;
+        crono = millis();
+        digitalWrite(Saida_Rele, HIGH);
+      }
+      // Verificando o toque para o botão "Voltar"
+
+      else if (x >= botoes[6].posX && x <= (botoes[6].posX + botoes[6].largura) &&
+               y >= botoes[6].posY && y <= (botoes[6].posY + botoes[6].altura))
+      {
+        
+        
+          telaInicio();
+          varb = 0;
+        
+      }
+    }
   }
 }
 //====================================================================================================================//
@@ -279,9 +279,9 @@ void cronometro()
 {
   if (millis() > crono + TempoCronometro && varb == 1)
   {
-
     digitalWrite(Saida_Rele, LOW);
-    Serial.println(crono);
+    crono = 0;
+    // TempoCronometro = 0;
   }
 }
 //====================================================================================================================//
@@ -309,6 +309,4 @@ void loop()
 {
   cronometro();
   checkButtonPress();
-  Serial.println(digitalRead(T_IRQ));
-  Serial.println(pag);
 }
