@@ -15,57 +15,23 @@ typedef struct
   uint16_t corFundo;
   uint16_t corTexto;
   uint16_t corPressionado;
+  uint16_t raioArredondamento;
 } Botao;
 
 // Array de estruturas Botao para definir vários botões na tela.
 Botao botoes[] = {
     // Definição dos botões com suas respectivas propriedades (posição, tamanho, texto, cores)
-    {40, 20, 160, 70, "Ligar", TFT_BLUE, TFT_WHITE, TFT_DARKGREY},
-    {40, 90, 160, 70, "Desligar", TFT_RED, TFT_WHITE, TFT_DARKGREY},
-    {40, 160, 160, 70, "Configurar", TFT_YELLOW, TFT_WHITE, TFT_DARKGREY},
-    {
-        60,
-        20,
-        60,
-        60,
-        "+",
-        TFT_GREEN,
-        TFT_WHITE,
-        TFT_DARKGREY,
-    }, // Botão de Mais
-    {
-        140,
-        20,
-        60,
-        60,
-        "-",
-        TFT_GREEN,
-        TFT_WHITE,
-        TFT_DARKGREY,
-    }, // Botão de Menos
-    {
-        60,
-        100,
-        140,
-        60,
-        "Definir",
-        TFT_BLUE,
-        TFT_WHITE,
-        TFT_DARKGREY,
-    },
-    {
-        40,
-        160,
-        160,
-        70,
-        "Voltar",
-        TFT_BLUE,
-        TFT_WHITE,
-        TFT_DARKGREY,
-    }};
+    {40, 20, 180, 80, "Ligar", TFT_BLUE, TFT_WHITE, TFT_DARKGREY},
+    {40, 110, 180, 80, "Desligar", TFT_RED, TFT_WHITE, TFT_DARKGREY},
+    {40, 200, 180, 80, "Configurar", TFT_YELLOW, TFT_WHITE, TFT_DARKGREY},
+    {60, 20, 60, 60, "+", TFT_GREEN, TFT_WHITE, TFT_DARKGREY}, // Botão de Mais menor
+    {160, 20, 60, 60, "-", TFT_GREEN, TFT_WHITE, TFT_DARKGREY}, // Botão de Menos menor
+    {50, 120, 160, 60, "Definir", TFT_BLUE, TFT_WHITE, TFT_DARKGREY},
+    {50, 190, 160, 60, "Voltar", TFT_BLUE, TFT_WHITE, TFT_DARKGREY}};
 
-//====================================================================================================================//
-// Declaração de funções que serão utilizadas no programa.
+
+    //====================================================================================================================//
+    // Declaração de funções que serão utilizadas no programa.
 void desenhaBotao(Botao b);
 void checkButtonPress();
 void TelaConfigurar();
@@ -138,13 +104,15 @@ void checkButtonPress()
       {
         TempoCronometro += 1000;
         atualizaDisplayValor();
+        valor += 1;
       }
       // Verificando o toque para o botão "Menos"
       else if (x >= botoes[4].posX && x <= (botoes[4].posX + botoes[4].largura) &&
                y >= botoes[4].posY && y <= (botoes[4].posY + botoes[4].altura))
       {
-        if(TempoCronometro>0){
-        TempoCronometro -= 1000;
+        if (TempoCronometro > 0)
+        {
+          TempoCronometro -= 1000;
         }
         atualizaDisplayValor();
       }
@@ -163,11 +131,9 @@ void checkButtonPress()
       else if (x >= botoes[6].posX && x <= (botoes[6].posX + botoes[6].largura) &&
                y >= botoes[6].posY && y <= (botoes[6].posY + botoes[6].altura))
       {
-        
-        
-          telaInicio();
-          varb = 0;
-        
+
+        telaInicio();
+        varb = 0;
       }
     }
   }
