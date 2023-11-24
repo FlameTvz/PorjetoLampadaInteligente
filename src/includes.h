@@ -19,3 +19,6 @@
 #define LED_BUILTIN 2
 
 #define T_IRQ 27
+
+#define TFT_DARKRED    0x8000  // Exemplo de definição de cor (Valores aproximados para Dark Red)
+#define TFT_SLATEGRAY  0x7412  // Exemplo de definição de cor (Valores aproximados para Slate Gray)

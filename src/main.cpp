@@ -21,17 +21,17 @@ typedef struct
 // Array de estruturas Botao para definir vários botões na tela.
 Botao botoes[] = {
     // Definição dos botões com suas respectivas propriedades (posição, tamanho, texto, cores)
-    {40, 20, 180, 80, "Ligar", TFT_BLUE, TFT_WHITE, TFT_DARKGREY},
-    {40, 110, 180, 80, "Desligar", TFT_RED, TFT_WHITE, TFT_DARKGREY},
-    {40, 200, 180, 80, "Configurar", TFT_YELLOW, TFT_WHITE, TFT_DARKGREY},
-    {60, 20, 60, 60, "+", TFT_GREEN, TFT_WHITE, TFT_DARKGREY}, // Botão de Mais menor
-    {160, 20, 60, 60, "-", TFT_GREEN, TFT_WHITE, TFT_DARKGREY}, // Botão de Menos menor
-    {50, 120, 160, 60, "Definir", TFT_BLUE, TFT_WHITE, TFT_DARKGREY},
-    {50, 190, 160, 60, "Voltar", TFT_BLUE, TFT_WHITE, TFT_DARKGREY}};
+    {20, 20, 200, 50, "Ligar", TFT_DARKCYAN, TFT_WHITE, TFT_DARKGREY},
+    {20, 80, 200, 50, "Desligar", TFT_DARKRED, TFT_WHITE, TFT_DARKGREY},
+    {20, 140, 200, 50, "funçoes", TFT_OLIVE, TFT_WHITE, TFT_DARKGREY},
+    {15, 30, 100, 50, "+", TFT_DARKCYAN, TFT_WHITE, TFT_DARKGREY},   // Botão Mais
+    {120, 30, 100, 50, "-", TFT_DARKRED, TFT_WHITE, TFT_DARKGREY},        // Botão Menos na parte superior
+    {20, 150, 200, 50, "Definir", TFT_OLIVE, TFT_WHITE, TFT_DARKGREY}, // Botão Definir um pouco abaixo
+    {20, 210, 200, 50, "Voltar", TFT_SLATEGRAY, TFT_WHITE, TFT_DARKGREY}   // Botão Voltar ainda mais abaixo
+};
 
-
-    //====================================================================================================================//
-    // Declaração de funções que serão utilizadas no programa.
+//====================================================================================================================//
+// Declaração de funções que serão utilizadas no programa.
 void desenhaBotao(Botao b);
 void checkButtonPress();
 void TelaConfigurar();
@@ -43,20 +43,22 @@ void atualizaDisplayValor();
 // Implementação da função desenhaBotao que recebe um botão e o desenha na tela.
 void desenhaBotao(Botao b)
 {
+  tft.setFreeFont(FF18);
   // Código para desenhar o botão no display.
   tft.fillRect(b.posX, b.posY, b.largura, b.altura, b.corFundo);
   tft.setTextColor(b.corTexto);
-  uint16_t textoX = b.posX + (b.largura - (strlen(b.texto) * 6)) / 2; // Ajuste aproximado para centralizar o texto
-  uint16_t textoY = b.posY + b.altura / 2 - 4;                        // Ajuste aproximado para centralizar o texto verticalmente
+  uint16_t textoX = b.posX + (b.largura - (strlen(b.texto) * 6)) / 2.5; // Ajuste aproximado para centralizar o texto
+  uint16_t textoY = b.posY + b.altura / 1.5 - 4;                        // Ajuste aproximado para centralizar o texto verticalmente
   tft.setCursor(textoX, textoY);
   tft.print(b.texto);
-}
+  
+  }
 //====================================================================================================================//
 // Função telaInicio para configurar a tela inicial com os botões principais.
 void telaInicio()
 {
   pag = 1;
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(TFT_WHITE);
   desenhaBotao(botoes[0]);
   desenhaBotao(botoes[1]);
   desenhaBotao(botoes[2]);
@@ -78,6 +80,7 @@ void checkButtonPress()
       if (x >= botoes[0].posX && x <= (botoes[0].posX + botoes[0].largura) &&
           y >= botoes[0].posY && y <= (botoes[0].posY + botoes[0].altura))
       {
+        
         digitalWrite(Saida_Rele, HIGH);
       }
       // Verificando o toque para o botão "Desligar"
@@ -91,7 +94,7 @@ void checkButtonPress()
       else if (x >= botoes[2].posX && x <= (botoes[2].posX + botoes[2].largura) &&
                y >= botoes[2].posY && y <= (botoes[2].posY + botoes[2].altura))
       {
-        tft.fillScreen(TFT_BLACK);
+        tft.fillScreen(TFT_WHITE);
         TelaConfigurar();
       }
     }
@@ -103,8 +106,8 @@ void checkButtonPress()
           y >= botoes[3].posY && y <= (botoes[3].posY + botoes[3].altura))
       {
         TempoCronometro += 1000;
+        delay(100);
         atualizaDisplayValor();
-        valor += 1;
       }
       // Verificando o toque para o botão "Menos"
       else if (x >= botoes[4].posX && x <= (botoes[4].posX + botoes[4].largura) &&
@@ -114,6 +117,7 @@ void checkButtonPress()
         {
           TempoCronometro -= 1000;
         }
+        delay(100);
         atualizaDisplayValor();
       }
 
@@ -143,13 +147,13 @@ void checkButtonPress()
 void atualizaDisplayValor()
 {
   // Código para atualizar o valor exibido no display.
-  tft.fillRect(posX, posY - 20, 100, 40, TFT_BLACK);
+  tft.fillRect(posX, posY - 20, 100, 40, TFT_WHITE);
   // Configura a posição e cor para o texto do valor.
   tft.setCursor(posX, posY);
   tft.setTextColor(corTexto);
 
   // Mostra o valor atualizado na tela.
-  tft.print(TempoCronometro);
+  tft.print(TempoCronometro/1000);
 
   delay(100);
 }
@@ -255,7 +259,7 @@ void cronometro()
 void setup()
 {
   Serial.begin(115200); // UART 0
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(TFT_WHITE);
   pinMode(Saida_Rele, OUTPUT);
   pinMode(T_IRQ, INPUT);
 
@@ -263,10 +267,10 @@ void setup()
   tft.init();
   tft.setRotation(2);
   touch_calibrate();
-  tft.setTextSize(2);
+  tft.setTextSize(1);
   tft.setTextColor(TFT_WHITE);
   tft.setCursor(0, 0);
-  tft.fillScreen(TFT_BLACK);
+  tft.fillScreen(TFT_WHITE);
   telaInicio();
   //====================================================================================================================//
 }
